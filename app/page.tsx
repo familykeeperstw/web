@@ -1,11 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { Autoplay, EffectFade, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/effect-fade";
-import "swiper/css/pagination";
+import { getLatestNews } from "@/lib/notion";
+import SlidesCarousel from "./components/SlidesCarousel";
 
 const lifeStages = [
   {
@@ -28,25 +23,6 @@ const lifeStages = [
   },
 ];
 
-const slides = [
-  {
-    label: "最新消息",
-    title: "2026 婚姻成長營：重新定義愛的深度",
-    description: "給彼此一個週末，找回心靈連結的初衷。",
-    image:
-      "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2000",
-    href: "/marriage",
-  },
-  {
-    label: "活動預告",
-    title: "數位時代的親子溝通：建立信任橋樑",
-    description: "當螢幕成為隔閡，我們如何進行有溫度的對話？",
-    image:
-      "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=2000",
-    href: "/parenting",
-  },
-];
-
 const aboutLinks = [
   { title: "異象使命", href: "/about" },
   { title: "師資團隊", href: "/about" },
@@ -54,44 +30,57 @@ const aboutLinks = [
   { title: "代禱信", href: "/resources" },
 ];
 
-export default function HomePage() {
+// 轉換 Notion 資料為 Swiper slides 格式
+function transformNotionToSlides(notionItems: any[]) {
+  return notionItems.slice(0, 2).map((item: any) => {
+    const props = item.properties;
+    
+    // 依據 Notion 欄位名稱提取資料
+    const title = props.Name?.title?.[0]?.plain_text || "未命名";
+    const description = props.描述?.rich_text?.[0]?.plain_text || "";
+    const imageUrl = props.圖片?.files?.[0]?.file?.url || 
+                     props.圖片?.external?.url ||
+                     "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2000";
+    const label = props.標籤?.select?.name || "最新消息";
+    const href = props.連結?.url || "/resources";
+
+    return {
+      title,
+      description,
+      image: imageUrl,
+      label,
+      href,
+    };
+  });
+}
+
+export default async function HomePage() {
+  // 從 Notion 獲取最新消息
+  const newsItems = await getLatestNews();
+  const slides = transformNotionToSlides(newsItems);
+  
+  // 如果沒有 Notion 資料，使用備用資料
+  const fallbackSlides = [
+    {
+      label: "最新消息",
+      title: "2026 婚姻成長營：重新定義愛的深度",
+      description: "給彼此一個週末，找回心靈連結的初衷。",
+      image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=2000",
+      href: "/marriage",
+    },
+    {
+      label: "活動預告",
+      title: "數位時代的親子溝通：建立信任橋樑",
+      description: "當螢幕成為隔閡，我們如何進行有溫度的對話？",
+      image: "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=2000",
+      href: "/parenting",
+    },
+  ];
+  
+  const displaySlides = slides.length > 0 ? slides : fallbackSlides;
   return (
     <div className="home-2026 bg-[#FCF8F5] text-[#3D2E1F]">
-      <section className="mb-12">
-        <Swiper
-          modules={[Autoplay, EffectFade, Pagination]}
-          loop
-          autoplay={{ delay: 5000, disableOnInteraction: false }}
-          pagination={{ clickable: true }}
-          effect="fade"
-          fadeEffect={{ crossFade: true }}
-          className="home-swiper h-[75vh] w-full"
-        >
-          {slides.map((slide) => (
-            <SwiperSlide key={slide.title}>
-              <div className="relative h-full w-full">
-                <img src={slide.image} alt={slide.title} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60" />
-                <div className="absolute bottom-[10%] left-[5%] right-[5%] mx-auto max-w-[850px] rounded-[2.5rem] border border-white/20 bg-white/15 p-10 text-white backdrop-blur-xl">
-                    <span className="mb-4 inline-block rounded-full bg-[#D1739C] px-4 py-1 text-sm font-black">
-                    {slide.label}
-                  </span>
-                  <h2 className="mb-4 text-3xl font-black text-white md:text-5xl">
-                    {slide.title}
-                  </h2>
-                  <p className="mb-6 text-lg opacity-90">{slide.description}</p>
-                  <Link
-                    href={slide.href}
-                    className="inline-flex rounded-full border-2 border-white px-8 py-2 font-black transition hover:bg-white hover:text-black"
-                  >
-                    查看詳情
-                  </Link>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </section>
+      <SlidesCarousel slides={displaySlides} />
 
       <section id="stages" className="mx-auto max-w-6xl px-6 py-12 md:py-16">
         <div className="mb-14 border-l-8 border-[#D1739C] pl-6 text-left">
