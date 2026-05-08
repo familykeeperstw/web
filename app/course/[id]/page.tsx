@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   return {
-    title: `課程詳情 - 台灣真愛家庭協會`,
-    description: '專業家庭教育課程與協談輔導服務',
+    title: `課程詳情 | 台灣真愛家庭協會`,
+    description: '提供專業的家庭教育與輔導協談服務。',
   };
 }
 
