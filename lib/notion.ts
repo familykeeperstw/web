@@ -1,31 +1,20 @@
-// lib/notion.ts
 import { Client } from "@notionhq/client";
 
-const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
-});
-
-const notionNewsDatabaseId = process.env.NOTION_NEWS_DB_ID || "";
+const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 export async function getLatestNews() {
-  // 確保 database_id 存在，並使用正確的 query 語法
-  if (!notionNewsDatabaseId) return [];
+  const databaseId = process.env.NOTION_NEWS_DB_ID;
+  if (!databaseId) return [];
 
+  // 確保使用正確的 query 方法
   const response = await notion.databases.query({
-    database_id: notionNewsDatabaseId,
+    database_id: databaseId,
     filter: {
       property: "✅ 狀態",
-      select: {
-        equals: "已發佈", // 請確保 Notion 中的屬性與此一致
+      select: { // 假設您的狀態是 select 類型
+        equals: "已發佈",
       },
     },
-    sorts: [
-      {
-        property: "🗓️ 日期",
-        direction: "descending",
-      },
-    ],
   });
-
   return response.results;
 }
