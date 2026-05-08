@@ -5,18 +5,15 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 export async function getLatestNews() {
   const databaseId = process.env.NOTION_NEWS_DB_ID;
-  if (!databaseId) {
-    console.error("Missing NOTION_NEWS_DB_ID");
-    return [];
-  }
+  if (!databaseId) return [];
 
-  // 加上 try-catch 確保 build 過程不會因 API 報錯而中斷
   try {
+    // 確保這裡的呼叫符合 @notionhq/client 的最新 API
     const response = await notion.databases.query({
       database_id: databaseId,
       filter: {
         property: "✅ 狀態",
-        status: { // 若 Notion 欄位是「狀態」類型，請使用 status
+        status: { // 注意：若 Notion 欄位是「狀態」類型，請使用 status 而非 select
           equals: "已發佈",
         },
       },
