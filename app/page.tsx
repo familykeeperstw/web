@@ -108,7 +108,7 @@ export default async function HomePage() {
                 ))}
               </div>
               <div className="cta-link-wrapper stage-cta-link mt-auto">
-                <span>→</span>
+                了解更多 <span>→</span>
               </div>
             </Link>
           ))}

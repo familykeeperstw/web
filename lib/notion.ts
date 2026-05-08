@@ -1,24 +1,29 @@
 // lib/notion.ts
 import { Client } from "@notionhq/client";
 
-// 初始化 Notion 客戶端
-const notion = new Client({ auth: process.env.NOTION_TOKEN });
+// 這個檔案目前只處理「最新消息」Notion 資料庫
+const notionToken = process.env.NOTION_TOKEN;
+const notionNewsDatabaseId = process.env.NOTION_NEWS_DB_ID;
+
+if (!notionToken) {
+  throw new Error("Missing NOTION_TOKEN environment variable.");
+}
+
+if (!notionNewsDatabaseId) {
+  throw new Error("Missing NOTION_NEWS_DB_ID environment variable.");
+}
+
+const notion = new Client({ auth: notionToken });
 
 export async function getLatestNews() {
-  const databaseId = process.env.NOTION_NEWS_DB_ID; // 建議確認 Vercel 上的 Key 名稱
-  
-  if (!databaseId) {
-    console.error("錯誤：找不到 NOTION_NEWS_DB_ID 環境變數");
-    return [];
-  }
-
   const response = await notion.databases.query({
-    database_id: databaseId,
+    database_id: notionNewsDatabaseId,
     filter: {
-      property: "✅ 狀態", // 確保這與您 Notion 欄位名稱一致
+      property: "✅ 狀態",
       select: { equals: "已發布" },
     },
     sorts: [{ property: "🗓️ 發布日期", direction: "descending" }],
+    page_size: 5,
   });
 
   return response.results;
