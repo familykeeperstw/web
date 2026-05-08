@@ -1,0 +1,35 @@
+
+> my-web-project@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.2 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.110:3000
+- Environments: .env.local
+✓ Ready in 249ms
+
+Session Data: undefined
+Session Data: undefined
+ GET / 200 in 233ms (next.js: 126ms, application-code: 107ms)
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+目前 Session 內容: {
+  user: {
+    name: 'Kuanmin Chen',
+    email: 'kuanminchen@gmail.com',
+    image: 'https://lh3.googleusercontent.com/a/ACg8ocKODdcCmgOhgtt0SPxb9aypiRHksiZZPy7JHS_lAuAx_WHnErHGzw=s96-c'
+  },
+  expires: '2026-06-01T09:02:42.275Z'
+}
+ GET /api/auth/session 200 in 593ms (next.js: 576ms, application-code: 17ms)
+ GET /resources 200 in 48ms (next.js: 31ms, application-code: 16ms)
+目前 Session 內容: {
+  user: {
+    name: 'Kuanmin Chen',
+    email: 'kuanminchen@gmail.com',
+    image: 'https://lh3.googleusercontent.com/a/ACg8ocKODdcCmgOhgtt0SPxb9aypiRHksiZZPy7JHS_lAuAx_WHnErHGzw=s96-c'
+  },
+  expires: '2026-06-01T09:03:10.073Z'
+}
+ GET /api/auth/session 200 in 29ms (next.js: 14ms, application-code: 15ms)
+[?25h
