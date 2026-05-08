@@ -1,4 +1,4 @@
-// ./lib/notion.ts 修正建議
+// ./lib/notion.ts 修正代碼
 import { Client } from "@notionhq/client";
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
@@ -8,12 +8,12 @@ export async function getLatestNews() {
   if (!databaseId) return [];
 
   try {
-    // 確保這裡的呼叫符合 @notionhq/client 的最新 API
     const response = await notion.databases.query({
       database_id: databaseId,
       filter: {
         property: "✅ 狀態",
-        status: { // 注意：若 Notion 欄位是「狀態」類型，請使用 status 而非 select
+        // 注意：若您的 Notion 欄位是「狀態」類型而非「選取」，語法如下
+        status: {
           equals: "已發佈",
         },
       },
