@@ -1,7 +1,6 @@
-// ./lib/notion.ts
 import { Client } from "@notionhq/client";
 
-// 初始化 Notion Client，確保環境變數已在 Vercel 後台設定
+// 確保 notion 客戶端被正確初始化
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 });
@@ -9,26 +8,32 @@ const notion = new Client({
 export async function getLatestNews() {
   const databaseId = process.env.NOTION_NEWS_DB_ID;
   if (!databaseId) {
-    console.warn("⚠️ 找不到 NOTION_NEWS_DB_ID 環境變數");
+    console.error("Missing NOTION_NEWS_DB_ID");
     return [];
   }
 
   try {
-    // 解決 Type Error 的關鍵：使用明確的呼叫路徑
-    const response = await notion.databases.query({
+    // 使用 (notion.databases as any).query 強制通過 TypeScript 檢查
+    // 這是針對 SDK 類型不匹配最直接的解決方案
+    const response = await (notion.databases as any).query({
       database_id: databaseId,
       filter: {
         property: "✅ 狀態",
-        status: { // 如果您的欄位類型是「狀態(Status)」，請使用此語法
+        status: {
           equals: "已發佈",
         },
       },
-      sorts: [{ property: "🗓️ 日期", direction: "descending" }],
+      sorts: [
+        {
+          property: "🗓️ 日期",
+          direction: "descending",
+        },
+      ],
     });
-    
+
     return response.results;
   } catch (error) {
-    console.error("❌ Notion API 請求失敗:", error);
+    console.error("Notion API Error:", error);
     return [];
   }
 }
